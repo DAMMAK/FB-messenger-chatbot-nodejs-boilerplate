@@ -17,9 +17,10 @@
 
  const test = async()=>
  {
-    const url ='http://localhost:3200/test';
+    const url =`https://ironhack-pokeapi.herokuapp.com/pokemon/1`;
     const getResult =await axios.get(url);
     console.log('Axios Await Result \n', getResult);
  }
  test();
+ 
  app.listen(3200, ()=>console.log(`Server is listening to PORT 3200`));

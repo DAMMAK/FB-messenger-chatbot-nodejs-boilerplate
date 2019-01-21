@@ -1,7 +1,12 @@
 import config from '../config/config';
 import crypto from 'crypto';
 import axios from 'axios';
+import rp from 'request-promise';
+import cf from '../helpers/custom';
+import uuidv4  from 'uuid';
 
+
+const sessionIds = new Map();
 const checkConfig=(req, res, next)=>
 {
 
@@ -64,6 +69,12 @@ const postWebhook =(req, res, next) => {
                     confirmMessageDeliver(event);
                 }
                 else if(event.optin){
+                    eventAuthentication(event);
+                }
+                else if(event.postback){
+                    eventPostback(event);
+                }
+                else if(event.message){
 
                 }
             });
@@ -133,6 +144,104 @@ const sendTextMessage=(recipientID, text)=>{
 
 const SendAPIRequest=(data)=>
 {
+    let options ={
+        uri: 'https://graph.facebook.com/v2.6/me/messages',
+        qs:{
+            access_token: config.FB_PAGE_TOKEN,
+        },
+        method: 'POST',
+        body:{
+           some:messageData,
+        },
+        json:true
+    }
+  const result = await rp(options);
+  console.log('Get Facebook Data \n', getResult);
+
+  let recipientID =result.recipient_id;
+  let messageID = result.message_id;
+  if(messageID){
+    console.log(`successfully sent message with ${messageID} to ${recipientID}`);
+  }
+  else
+  {
+      console.log(`Successfully connected to Facebook Chatbot API for recipient ${recipientID}`);
+      
+  }
+
+  if(!result) console.log(`Failed Calling Facebook Messenger API`);
+  
+
+      
+  
+}
+
+const eventPostback=(event)=> {
+    let senderID = event.sender.id;
+    let recipientID = event.recipient.id;
+    let postbackTime = event.timestamp;
+
+    let payload = event.postback.payload;
+
+    switch(payload){
+        case "GET_STARTED":
+            cf.GET_STARTED();
+        break;
+
+        default:
+        sendTextMessage(senderID,config.PAYLOAD_DEFAULT_MESSAGE);
+        console.log(`${senderID} ${config.PAYLOAD_DEFAULT_MESSAGE}`);
+    }
+
+    console.log();
+    
+}
+
+const recievedMessage= ()=>
+{
+    let senderID = event.sender.id;
+    let recipientID = event.recipient.id;
+    let timeOfMessage = event.timeStamp;
+    let message = event.message;
+    if(!sessionIds.has(senderID)) sessionIds.set(senderID, uuidv4());
+    let isEcho = message.is_echo;
+    let messageID= message.mid;
+    let appID= message.app_id;
+    let metadata= message.metadata;
+
+    //You may get a text or attachment but not both
+
+    let messageText = message.text;
+    let messageAttachments = message.attachments;
+    let quicklyReply = message.quick_reply;
+    if(isEcho){
+        handleEcho(messageID, appID, metadata);
+        return;
+    }
+    else if(quicklyReply){
+        handleQuickReply();
+        return;
+    }
+
+    if(messageText){
+        
+    }
+}
+/*https://developers.facebook.com/docs/messenger-platform/reference/webhook-events/message-echoes/
+This callback will occur when a message has been sent by your page. You may receive text messsages 
+or messages with attachments (image, video, audio, template or fallback).*/
+
+const handleEcho=(messageId, appId, metadata)=>
+{
+    //Just logging message echoes to console
+    console.log(`Received echo for message ${messageId} and app ${appId} with metadata ${metadata}`);
+    
+}
+
+const handleQuickReply(senderID, quicklyReply,messageID){
+    let quickReplyPayload = quicklyReply.payload;
+    console.log(`Quick reply for message ${messageID} with payload data ${quickReplyPayload}`);
+    
 
 }
 
