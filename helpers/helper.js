@@ -75,12 +75,21 @@ const postWebhook =(req, res, next) => {
                     eventPostback(event);
                 }
                 else if(event.message){
-
+                    recievedMessage(event);
+                }
+                else if(event.account_linking)
+                {
+                    accountLinkingHandler(event);
+                }
+                else{
+                    console.log(`Unknown Message Event`);
                 }
             });
             
 
-        })
+        });
+
+        res.sendStatus(200);
     }
     
 }
@@ -224,7 +233,10 @@ const recievedMessage= ()=>
     }
 
     if(messageText){
-        
+        dialogFlowHandler(senderID, messageText);
+    }
+    else if (messageAttachments){
+        messageAttachment(messageAttachments, senderID);
     }
 }
 /*https://developers.facebook.com/docs/messenger-platform/reference/webhook-events/message-echoes/
@@ -238,11 +250,29 @@ const handleEcho=(messageId, appId, metadata)=>
     
 }
 
-const handleQuickReply(senderID, quicklyReply,messageID){
+const handleQuickReply=(senderID, quicklyReply,messageID)=>{
     let quickReplyPayload = quicklyReply.payload;
     console.log(`Quick reply for message ${messageID} with payload data ${quickReplyPayload}`);
-    
+}
 
+const dialogFlowHandler=(senderID, data)=>
+{
+
+}
+
+const messageAttachment =(messageAttachment, senderID, responseMsg=`Attachment recieved Thank you`){
+    sendTextMessage(senderID, responseMsg);
+}
+
+const accountLinkingHandler =(event)=>
+{
+    let senderID = event.sender.id;
+    let recipientID = event.recipient.id;
+
+    let linkingStatus = event.account_linking.status;
+    let authCode = event.account_linking.authorization_code;
+
+    console.log(`Accouting successfully linked for ${senderID} with status ${status} and authorization Code ${authCode}`)
 }
 
 export default {
