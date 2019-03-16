@@ -1,10 +1,9 @@
-import config from '../config/config';
-import crypto from 'crypto';
-import axios from 'axios';
-import rp from 'request-promise';
-import cf from '../helpers/custom';
-import uuidv4  from 'uuid';
-
+import config from "../config/config";
+import crypto from "crypto";
+import axios from "axios";
+import rp from "request-promise";
+import cf from "../helpers/custom";
+import uuidv4 from "uuid";
 
 const sessionIds = new Map();
 const checkConfig = (req, res, next) => {
@@ -324,4 +323,4 @@ export default {
   verifyIncomingSignature,
   getWebhook,
   postWebhook
-}
+};
