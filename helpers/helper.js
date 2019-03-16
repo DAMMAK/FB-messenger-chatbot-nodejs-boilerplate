@@ -136,7 +136,42 @@ const eventPostback = event => {
   // eslint-disable-next-line no-unused-vars
   const postbackTime = event.timestamp;
 
+<<<<<<< HEAD
   const { payload } = event.postback;
+=======
+const handleQuickReply=(senderID, quicklyReply,messageID)=>{
+    let quickReplyPayload = quicklyReply.payload;
+    console.log(`Quick reply for message ${messageID} with payload data ${quickReplyPayload}`);
+    // Send Payload to API.AI
+    dialogFlowHandler(senderID, quickReplyPayload);
+}
+
+const handleMessage = (message, senderID)=>
+{
+    // Handler for different kind of message e.g text, quickReplies, image, custom payload e.g card
+    switch (message.type) {
+        //text message
+        case 0:
+            sendTextMessage(senderID, message.speech);
+            break;
+        //QuickReplies
+        case 2: 
+        let replies =[];
+            message.replies.forEach((reqReply)=>
+            {
+                let reply ={
+                    "content_type": "text",
+                    "title": reqReply,
+                    "payload": reqReply
+                }
+            replies.push(reply);
+            });
+        handleQuickReply
+        default:
+            break;
+    }
+}
+>>>>>>> e361e1edaa2733b8647c21b1078afad47f36f539
 
   switch (payload) {
     case "GET_STARTED":
@@ -317,6 +352,18 @@ const postWebhook = (req, res) => {
     res.sendStatus(200);
   }
 };
+
+const dialogFlowAction=(action, contexts, senderID,responseText, parameters)=>
+{
+    switch (action) {
+        case "value":
+            
+            break;
+    
+        default:
+            break;
+    }
+}
 
 export default {
   checkConfig,
