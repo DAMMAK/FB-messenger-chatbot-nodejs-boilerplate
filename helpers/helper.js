@@ -253,6 +253,34 @@ const handleEcho=(messageId, appId, metadata)=>
 const handleQuickReply=(senderID, quicklyReply,messageID)=>{
     let quickReplyPayload = quicklyReply.payload;
     console.log(`Quick reply for message ${messageID} with payload data ${quickReplyPayload}`);
+    // Send Payload to API.AI
+    dialogFlowHandler(senderID, quickReplyPayload);
+}
+
+const handleMessage = (message, senderID)=>
+{
+    // Handler for different kind of message e.g text, quickReplies, image, custom payload e.g card
+    switch (message.type) {
+        //text message
+        case 0:
+            sendTextMessage(senderID, message.speech);
+            break;
+        //QuickReplies
+        case 2: 
+        let replies =[];
+            message.replies.forEach((reqReply)=>
+            {
+                let reply ={
+                    "content_type": "text",
+                    "title": reqReply,
+                    "payload": reqReply
+                }
+            replies.push(reply);
+            });
+        handleQuickReply
+        default:
+            break;
+    }
 }
 
 const dialogFlowHandler=(senderID, data)=>
@@ -273,6 +301,18 @@ const accountLinkingHandler =(event)=>
     let authCode = event.account_linking.authorization_code;
 
     console.log(`Accouting successfully linked for ${senderID} with status ${status} and authorization Code ${authCode}`)
+}
+
+const dialogFlowAction=(action, contexts, senderID,responseText, parameters)=>
+{
+    switch (action) {
+        case "value":
+            
+            break;
+    
+        default:
+            break;
+    }
 }
 
 export default {
